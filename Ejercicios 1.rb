@@ -456,9 +456,221 @@ ACCION Ejercicio_1_1_15 ES
         ESCRIBIR("La altura promedio del edificio de ", cantidad_pisos, " pisos es ", altura_edificio, " pies.")
 FIN_ACCION
 
-================================================================================================================
+?================================================================================================================
 
 ACCION Ejercicio_1_1_16 ES
+	AMBIENTE
+
+	PROCESO
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejercicio_1_1_17 ES
+	AMBIENTE
+		nro1: entero
+		nro2: entero
+		producto: entero
+
+	PROCESO
+		ESCRIBIR("Ingrese dos numeros enteros para calcular su producto")
+		LEER(nro1, nro2)
+
+		producto := 0
+		Para nro1 hasta 1, -1 hacer
+			producto := producto + nro2
+		
+		ESCRIBIR("El producto de ", nro1, " y ", nro2, " es ", producto)
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejercicio_1_1_18 ES
+	AMBIENTE
+		dividendo: entero
+		divisor: entero
+		cociente: entero
+
+	PROCESO
+		ESCRIBIR("Calcula el la division entera entre dos numeros enteros")
+		ESCRIBIR("Ingrese el valor de DIVIDENDO y luego del DIVISOR")
+		LEER(dividendo, divisor)
+
+		cociente := 0
+
+		Mientras dividendo>divisor hacer
+			dividendo := dividendo - divisor
+			cociente := cociente + 1
+		FinMientras
+
+		ESCRIBIR("El resultado de la division entera es: ", cociente, " y el resto: ", dividendo)
+
+================================================================================================================
+
+ACCION Ejercicio_1_1_19 ES
+	AMBIENTE
+		variable: real
+		cuadrado: real
+		cubo: real
+
+	PROCESO
+		ESCRIBIR8("Ingresar un valor cualquiera para obtener su CUADRADO y su CUBO")
+		LEER(variable)
+
+		cuadrado := variable**2
+		cubo := variable**3
+
+		ESCRIBIR("El valor ingresado es: ", variable, ", su cuadrado: ", cuadrado, ", y su cubo: ", cubo)
+FIN_ACCION
+
+?================================================================================================================
+
+ACCION Ejercicio_1_1_20 ES
+	AMBIENTE
+	variable: real
+	cuadrado: real
+	cubo: real
+
+	PROCESO
+		ESCRIBIR8("Ingresar un valor cualquiera para obtener su CUADRADO y su CUBO, y tambien de los suiguientes 10 valores")
+		LEER(variable)
+
+		Para vc := variable hasta (variable+10), 1 hacer
+			cuadrado := vc**2
+			cubo := vc**3
+
+			ESCRIBIR("Valor: ", variable, ", su cuadrado: ", cuadrado, ", su cubo: ", cubo)
+		FinPara
+FIN_ACCION
+
+?================================================================================================================
+
+ACCION Ejercicio_1_1_21 ES
+	AMBIENTE
+		variable: real
+		n_incrementos: entero
+		cuadrado: real
+		cubo: real
+		suma_cuadrado: real
+
+	PROCESO
+		ESCRIBIR8("Ingresar un valor cualquiera")
+		LEER(variable)
+		ESCRIBIR("Ingrese un valor entero que representa el nro de incrementos del valor anterior")
+		LEER(n_incrementos)
+		suma_cuadrado := 0
+
+		Para vc := variable hasta (variable+n) hacer
+			cuadrado := vc**2
+			cubo := vc**3
+			suma_cuadrado := suma_cuadrado + cuadrado
+
+			ESCRIBIR("El valor ingresado es: ", variable, ", su cuadrado: ", cuadrado, ", y su cubo: ", cubo)
+		FinPara
+		ESCRIBIR("La suma total de los cuadrados es: ", suma_cuadrado)
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejercicio_1_1_22 ES
+	AMBIENTE
+		numero: entero
+		es_primo: logico
+	PROCESO
+		ESCRIBIR("Ingrese un numero entero para averiguar si es un numero primo")
+		LEER(numero)
+
+		es_primo := verdadero
+
+		Para vc := 2 hasta (entero-1), 1 hacer
+			Si numero MOD vc = 0 entonces
+				es_primo := falso
+			FinSi
+		FinPara
+
+		Si numero = 2 entonces
+			ESCRIBIR("El numero ", numero, " es primo.")
+		Sino
+			Si es_primo = verdadero
+				ESCRIBIR("El numero ", numero, " es primo.")
+			Sino
+			ESCRIBIR("El numero ", numero, " NO es primo.")
+			FinSi
+		FinSi
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejercicio_1_1_23 ES
+	AMBIENTE
+		valor_unitario: entero
+		cantidad_vendida: real
+		total_renglon: real
+		total_factura: real
+		continuar: 0...1
+	
+	PROCESO
+		ESCRIBIR("Programa que devuelve el total de una factura")
+		total_factura := 1
+
+		Repetir
+			ESCRIBIR("El valor unitario y la cantidad vendida")
+			LEER(valor_unitario, cantidad_vendida)
+
+			total_renglon := valor_unitario*cantidad_vendida
+			total_factura := total_factura + total_factura
+
+			ESCRIBIR("Total renglon: ", total_renglon)
+			ESCRIBIR("Ingrese 1 para continuar agregando renglones o ingrese 0 para terminar")
+			LEER(continuar)
+		Hasta que continuar=0
+
+		ESCRIBIR("El total de la factura es de: ", total_factura)
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejercicio_1_1_24 ES
+	AMBIENTE
+		importe: real
+		IMPUESTO: real
+		total_impuesto: real
+		cuota: real
+		continuar: entero
+
+
+	PROCESO
+		ESCRIBIR("Calcula los montos a pagar segun impuesto y cuotas")
+
+		IMPUESTO := 0.10
+
+		Repetir
+			ESCRIBIR("Ingrese el importe")
+			LEER(importe)
+
+			total_impuesto := importe*IMPUESTO
+
+			Segun importe hacer
+				<500: ESCRIBIR("Debe pagar 1 cuota de: ", importe, " mas impuesto de: ", total_impuesto)
+
+				<=1000: cuota := importe/2
+						ESCRIBIR("Debe pagar 2 cuotas de: ", cuota, " mas impuesto de: ", total_impuesto)
+
+				>1000: cuota := importe/3
+						ESCRIBIR("Debe pagar 3 cuotas de: ", cuota, " mas impuesto de: ", total_impuesto)
+			FinSegun
+
+			ESCRIBIR("Para continuar con otro importe ingrese 1. Para finalizar ingrese 9999")
+			LEER(continuar)
+		Hasta que continuar=9999
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejercicio_1_1_25 ES
+	
+
+
 
 
 
