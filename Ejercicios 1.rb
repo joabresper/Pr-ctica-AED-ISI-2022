@@ -437,23 +437,27 @@ ACCION Ejercicio_1_1_15 ES
     AMBIENTE
         cantidad_pisos: entero
         altura_piso_metros: real
-        pie_metro: real
         altura_edificio: real
+		respuesta: alfanumerico
+
+		pie_metro = 3.28
 
     PROCESO
-        ESCRIBIR("Calcule la altura de un edificio en pies")
-        ESCRIBIR("Ingrese la cantidad de pisos del edificio")
-        LEER(cantidad_pisos)
-        ESCRIBIR("Ingrese la altura promedio de cada piso en metros")
-        LEER(altura_piso_metros)
-        pie_metro := 3.28
-
+		ESCRIBIR("Desea comenzar el calculo? - si o no")
+		LEER(respuesta)
         
-        Para cantidad_pisos hasta 1, -1 hacer
-            altura_edificio := altura_edificio + altura_piso_metros*pie_metro
-        FinPara
+		Mientras respuesta = "si" hacer
+        	ESCRIBIR("Ingrese la cantidad de pisos del edificio ")
+        	LEER(cantidad_pisos)
+        	ESCRIBIR("Ingrese la altura promedio de cada piso, en metros")
+        	LEER(altura_piso_metros)
+        
+			altura_edificio := altura_piso_metros*pie_metro*cantidad_pisos
 
-        ESCRIBIR("La altura promedio del edificio de ", cantidad_pisos, " pisos es ", altura_edificio, " pies.")
+			ESCRIBIR("La altura promedio del edificio ", vc, " es de ", altura_edificio, " pies.")
+			ESCRIBIR("Desea continuar con el calculo? - si o no")
+			LEER(respuesta)
+		FinMientras
 FIN_ACCION
 
 ?================================================================================================================
@@ -576,6 +580,7 @@ ACCION Ejercicio_1_1_22 ES
 	AMBIENTE
 		numero: entero
 		es_primo: logico
+		vc: entero
 	PROCESO
 		ESCRIBIR("Ingrese un numero entero para averiguar si es un numero primo")
 		LEER(numero)
@@ -603,27 +608,38 @@ FIN_ACCION
 
 ACCION Ejercicio_1_1_23 ES
 	AMBIENTE
-		valor_unitario: entero
-		cantidad_vendida: real
+		valor_unitario: real
+		cantidad_vendida: entero
 		total_renglon: real
 		total_factura: real
-		continuar: 0...1
+		continuar: alfanumerico
 	
 	PROCESO
 		ESCRIBIR("Programa que devuelve el total de una factura")
-		total_factura := 1
+		total_factura := 0
 
-		Repetir
+		ESCRIBIR("Desea iniciar el calculo? (si/no)")
+		LEER(continuar)
+
+		total_factura := 0
+
+		Mientras continuar = "si" hacer
 			ESCRIBIR("El valor unitario y la cantidad vendida")
 			LEER(valor_unitario, cantidad_vendida)
+
+			Mientras valor_unitario <= 0 hacer
+				ESCRIBIR("ERROR! Valor unitario inadmisible. Debe ingresar un valor mayor a cero")
+				ESCRIBIR("Ingrese nuevamente el valor unitario")
+				LEER(valor_unitario)
+			FinMientras
 
 			total_renglon := valor_unitario*cantidad_vendida
 			total_factura := total_factura + total_factura
 
 			ESCRIBIR("Total renglon: ", total_renglon)
-			ESCRIBIR("Ingrese 1 para continuar agregando renglones o ingrese 0 para terminar")
+			ESCRIBIR("Desea continuar con el calculo? (si/no)")
 			LEER(continuar)
-		Hasta que continuar=0
+		FinMientras
 
 		ESCRIBIR("El total de la factura es de: ", total_factura)
 FIN_ACCION
@@ -668,6 +684,310 @@ FIN_ACCION
 ================================================================================================================
 
 ACCION Ejercicio_1_1_25 ES
+	AMBIENTE
+		anterior1: entero
+		anterior2: entero
+		numero: entero
+		vc: entero
+
+	PROCESO
+		ESCRIBIR("Primeros 50 elementos de la Sucesion de Fibonacci")
+		anterior1 := 0
+		anterior2 := 1
+
+		ESCRIBIR(anterior1)
+		ESCRIBIR(anterior2)
+
+		Para vc := 1 hasta 48, hacer
+			numero := anterior1 + anterior2
+			ESCRIBIR(numero)
+			anterior1 := anterior2
+			anterior2 := numero
+		FinPara
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejercicio_1_1_26 ES
+	AMBIENTE
+		X: real
+		Y: real
+		a: real
+		b: real
+		c: real
+		i: -20...20
+
+	PROCESO
+		ESCRIBIR("Ingrese los valores de los coeficientes de la funcion cuadratica: a, b y c")
+		LEER(a, b, c)
+
+		Para i := 20 hasta -20, -2 hacer
+			X := i
+			Y := a*(X**2) + b*X + c
+
+			ESCRIBIR(X, ", ", Y)
+		FinPara
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejercicio_1_1_27 ES
+	AMBIENTE
+		X: real
+		Y: real
+		a: real
+		b: real
+		c: real
+		i: -20...20
+		continuar: alfanumerico
+
+	PROCESO
+		ESCRIBIR("Desea iniciar el programa? (si/no)")
+		LEER(continuar)
+		
+		Mientras continuar = "si" hacer
+			ESCRIBIR("Ingrese los valores de los coeficientes de la funcion cuadratica: a, b y c")
+			LEER(a, b, c)
+
+			Para i := 20 hasta -20, -2 hacer
+				X := i
+				Y := a*(X**2) + b*X + c
+
+				ESCRIBIR(X, ", ", Y)
+			FinPara
+
+			ESCRIBIR("Desea continuar el calculo para otra funcion cuadratica diferente? (si/no)")
+			LEER(continuar)
+		FinMientras
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejercicio_1_1_28 ES
+	AMBIENTE
+		unidad: entero
+		decena: entero
+		centena: entero
+		vc: 100...999
+
+	PROCESO
+		ESCRIBIR("Algoritmo capaz de encontrar todas las cifras de tres dígitos que cumplan con la condición de que la suma de los cubos de sus dígitos sea igual al 	número que la cifra representa.")
+
+		Para vc := 100 hasta 999, hacer
+			centena := vc DIV 100
+        	decena := (vc MOD 100) DIV 10
+        	unidad := vc MOD 10
+
+			Si (unidad**3 + decena**3 + centena**3) = vc entonces
+				ESCRIBIR("el numero ", vc, " cumple con la condicion")
+			Sino	
+				ESCRIBIR("El numero ", vc, " NO cumple con la condicion")
+		FinPara
+FIN_ACCION
+
+
+================================================================================================================
+
+ACCION Ejercicio_1_1_29 ES
+	AMBIENTE
+		limite: entero
+		es_primo: logico
+		vc1: entero
+		vc2: entero
+
+	PROCESO
+		# Escriba un algoritmo para imprimir los números primos menores a un valor dado n.
+		ESCRIBIR("Ingrese un numero entero")
+		LEER(limite)
+
+		es_primo := verdadero
+
+		Para vc1 := 2 hasta (limite-1), hacer
+			Para vc2 := 2 hasta (vc1-1), hacer
+				Si vc1 MOD vc2 = 0 entonces
+					es_primo := falso
+				FinSi
+			FinPara
+
+			Si vc1 = 2 entonces
+				ESCRIBIR(vc1)
+			Sino
+				Si es_primo = verdadero entonces
+					ESCRIBIR(vc1)
+				FinSi
+			FinSi
+		FinPara
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejercicio_1_1_30 ES
+	AMBIENTE
+		categoria: 1...2
+		asistencia: ("si", "no")
+		antiguedad: entero
+		sueldo: real
+		vc: entero
+
+		SUELDO_BASICO_1 = 700
+		SUELDO_BASICO_2 = 500
+
+	PROGRAMA
+		Para vc := 1 hasta 100 hacer
+			ESCRIBIR("Indique la categoria a la que corresponde el chofer ", vc)
+			LEER(categoria)
+			ESCRIBIR("Indique si el chofer ", vc, " posee asistencia perfecta. (si/no)")
+			LEER(asistencia)
+			ESCRIBIR("Indique los años de antiguedad del chofer ", vc)
+			LEER(antiguedad)
+
+			Si categoria = 1 entonces
+				Si asistencia = "si" entonces
+					sueldo := SUELDO_BASICO_1 + (SUELDO_BASICO_1*0.02*antiguedad) + 200
+					ESCRIBIR("El sueldo del chofer ", vc, " es de: $", sueldo)
+				Sino
+					sueldo := SUELDO_BASICO_1 + (SUELDO_BASICO_1*0.02*antiguedad)
+					ESCRIBIR("El sueldo del chofer ", vc, " es de: $", sueldo)
+				FinSi
+			Sino
+				Si asistencia = "si" entonces
+					sueldo := SUELDO_BASICO_2 + (SUELDO_BASICO_2*0.02*antiguedad) + 200
+					ESCRIBIR("El sueldo del chofer ", vc, " es de: $", sueldo)
+				Sino
+					sueldo := SUELDO_BASICO_2 + (SUELDO_BASICO_2*0.02*antiguedad)
+					ESCRIBIR("El sueldo del chofer ", vc, " es de: $", sueldo)
+				FinSi
+			FinSi
+		FinPara
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejercicio_1_1_31 ES
+	AMBIENTE
+		calidad: 1...2
+		material: ("seda", "algodon")
+		peso_m2: real
+		longitud: real
+		peso_total: real
+		peso_pieza: real
+		finalizar: ("si", "no")
+
+		PESO_NUCLEO_1 = 400
+		PESO_NUCLEO_2 = 300
+		APRESTO_SEDA = 0.02
+		APRESTO_ALGODON = 0.07
+
+	PROCESO
+		ESCRIBIR("Programa que calcula el peso total de una o varias piezas de tela")
+
+		Repetir
+			ESCRIBIR("Indique el material de la pieza: (seda/algodon)")
+			LEER(material)
+			ESCRIBIR("Indique si el material es de primera o segunda calidad: (1/2)")
+			LEER(calidad)
+			ESCRIBIR("Ingrese la longitud en metros de la pieza: ")
+			LEER(longitud)
+			ESCRIBIR("Ingrese el peso por m2 de tela: ")
+			LEER(peso_m2)
+			# Se supone que los rollos de tela tienen un ancho de 1m por lo que la longitud de la tela es igual en valor a la superficie total de la pieza
+
+			peso_total := 0
+
+			Si calidad=1 entonces
+				Si material="seda" entonces
+					peso_pieza := (peso_m2*longitud)*(1+APRESTO_SEDA) + PESO_NUCLEO_1
+					peso_total := peso_total + peso_pieza
+				Sino
+					peso_pieza := (peso_m2*longitud)*(1+APRESTO_ALGODON) + PESO_NUCLEO_1
+					peso_total := peso_total + peso_pieza
+				FinSi
+			Sino
+				Si material="seda" entonces
+					peso_pieza := (peso_m2*longitud)*(1+APRESTO_SEDA) + PESO_NUCLEO_2
+					peso_total := peso_total + peso_pieza
+				Sino
+					peso_pieza := (peso_m2*longitud)*(1+APRESTO_ALGODON) + PESO_NUCLEO_2
+					peso_total := peso_total + peso_pieza
+				FinSi
+			FinSi
+
+			ESCRIBIR("¿Desea finalizar el programa? (si/no)")
+			LEER(finalizar)
+
+		Hasta que finalizar="si"
+FIN_ACCION	
+
+================================================================================================================
+
+ACCION Ejercicio_1_1_32 ES
+	AMBIENTE
+		A: entero
+		B: entero
+		C: entero
+		D: entero
+		E: entero
+		N: entero
+		anio: 1990...2010
+
+	PROCESO
+		ESCRIBIR("Programa que devuelve que dia corresponde al domingo de Pascua de los años comprendidos entre 1990 y 2012")+
+
+		Para anio := 1990 hasta 2010 hacer
+			A := anio MOD 19
+			B := anio MOD 4
+			C := anio MOD 7
+			D := (19*A + 24) MOD 30
+			E := (2*B + 4*C + 6*D + 5) MOD 7
+			N := 22 + D + E
+
+			Si N>31 entonces
+				N := N - 31
+				ESCRIBIR("En el año ", anio, ", corresponde al domingo de Pascua el dia ", N, " de abril.")
+			Sino
+				ESCRIBIR("En el año ", anio, ", corresponde al domingo de Pascua el dia ", N, " de marzo.")
+		FinPara
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejercicio_1_1_33 ES
+	AMBIENTE
+		N: entero
+		vc: entero
+
+	PROCESO
+		ESCRIBIR("Ingrese un numero entero par")
+		LEER(N)
+
+		Mientras (N MOD 2) <> 0 hacer
+			ESCRIBIR("ERROR! Por favor ingrese un numero entero par")
+			LEER(N)
+		FinMientras
+
+		Para vc := 1 hasta N, 2 hacer
+			Para vc := 1 hasta N, 2 hacer
+
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejercicio_1_1_34 ES
+
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejercicio_1_1_35 ES
+	AMBIENTE
+		
+
+
+
+
+
+
+
 	
 
 
