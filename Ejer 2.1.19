@@ -1,0 +1,53 @@
+ACCION Ejer_2_1_19 ES
+	AMBIENTE
+		sec: secuencia de caracter
+		v: caracter
+		sal: secuencia de caracter
+		l1: caracter
+		l2: caracter
+		l3: caracter
+		vc: entero
+		cont_pal_3: entero
+		cont_total: entero
+
+	PROCESO
+		ARRANCAR(sec)
+		CREAR(sal)
+		AVANZAR(sec, v)
+
+		cont_pal_3 := 0
+		cont_total := 0
+
+		Mientras NFDS(sec) hacer
+			# Tratar blancos
+			Mientras NFDS(sec) y v<>" " hacer
+				AVANZAR(sec, v)
+			FinMientras
+			# Tratar palabras
+			l1 := v
+			AVANZAR(sec, v)
+			Si v<>" " y NFDS(sec) entonces
+				l2 := v
+				AVANZAR(sec, v)
+
+				Si v<>" " y NFDS(sec) entonces
+					l3 := v
+					AVANZAR(sec, v)
+				FinSi
+
+				Si v=" " y NFDS(sec) entonces
+					cont_pal_3 := cont_pal_3 + 1
+					ESCRIBIR(sal, l1)
+					ESCRIBIR(sal, l2)
+					ESCRIBIR(sal, l3)
+					ESCRIBIR(sal, v)
+				FinSi
+			FinSi
+
+			cont_total := cont_total + 1
+		FinMientras
+
+		ESCRIBIR("El porcentaje de palabras de 3 caracteres sobre el total de la secuencia de entrada es de: ", (cont_pal_3/cont_total)*100)
+
+		CERRAR(sec); CERRAR(sal)
+FIN_ACCION
