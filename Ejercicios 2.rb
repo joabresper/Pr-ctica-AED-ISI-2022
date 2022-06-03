@@ -1147,7 +1147,7 @@ ACCION Ejer_2_3_1 ES
 		r: Alumno
 
 	PROCESO
-		ABRIR(arch_alumnos)
+		ABRIR E/ (arch_alumnos)
 		LEER(arch_alumnos, r)
 		
 		Mientras NFDS(arch_alumnos) hacer
@@ -1160,9 +1160,163 @@ FIN_ACCION
 
 ACCION Ejer_2_3_2 ES
 	AMBIENTE
-		
+		Fecha = Registro
+			anio: N(4)
+			mes: 1...12
+			dia: 1...31
+		FinRegistro
+
+		Factura = Registro
+			nro_factura: entero
+			fecha: Fecha
+			total: real
+		FinRegistro
+
+		arch: Archivo de Factura
+		reg: Factura
+
+		f: Fecha
+
 	PROCESO
+		ABRIR E/ (arch)
+		LEER(arch, reg)
+
+		ESCRIBIR("Ingrese una fecha con el siguiente formato: DD MM AAAA")
+		LEER(f.dia, f.mes, f.anio)
+
+		Mientras NFDS(arch) hacer
+			Si (reg.fecha>f) y (reg.total<1000) entonces
+				ESCRIBIR("| ", reg.nro_factura, " | ", reg.fecha, " | ", reg.total, " |")
+			FinSi
+			LEER(arch, reg)
+		FinMientras
+		CERRAR(arch)
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejer_2_3_3 ES
+	AMBIENTE
+		Socio_biblio = Registro
+			nro_socio: entero
+			nro_telefono: N(10)
+			apellido_nombre: AN(30)
+			carrera = ("ISI", "IEM", "IQ", "LAR")
+			domicilio = Registro
+				calle: AN(20)
+				nro: entero
+			FinRegistro
+			unid_prestadas: entero
+		FinRegistro
+
+		arch: Archivo de Socio_biblio
+		sal: Archivo de Socio_biblio
+		soc: Socio_biblio
+
+	PROCESO
+		ABRIR E/ (arch)
+		ABRIR /S (sal)
+		LEER(arch, soc)
+
+		Mientras NFDS(arch) hacer
+			Si (soc.carrera="ISI") y (soc.unid_prestadas>4) entonces
+				ESCRIBIR(sal, soc)
+			FinSi
+			LEER(arch, soc)
+		FinMientras
 		
+		CERRAR(arch); CERRAR(sal)
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejer_2_3_4 ES
+	AMBIENTE
+		Fecha = Registro
+			anio: N(4)
+			mes: 1...12
+			dia: 1...31
+		FinRegistro
+
+		Alumno = Registro
+			apellido_nombre: AN
+			carrera = ("ISI", "IQ", "IEM")
+			legajo: N(5)
+			fecha_nacimiento: Fecha
+			fecha_ingreso: Fecha
+			dni: N(8)
+			sexo = ("F", "M")
+			fecha_ult_examen_aprob: Fecha
+			nota: N(1.2)
+		FinRegistro
+
+		arch: Archivo de Alumno
+		sal: Archivo de Alumno
+		al: Alumno
+
+		carr: AN(3)
+		anio_actual: N(4)
+
+	PROCESO
+		ABRIR E/ (arch)
+		LEER(arch, al)
+		
+		ESCRIBIR("Ingrese una carrera: (ISI, IQ, IEM)")
+		LEER(carr)
+		ESCRIBIR("Ingrese el año actual: ")
+		LEER(anio_actual)
+
+		Mientras NFDA(arch) hacer
+			Si (al.fecha_ult_examen_aprob.anio=anio_actual) y (al.nota>7) entonces
+				ESCRIBIR(sal, al)
+			FinSi
+			LEER(arch, al)
+		FinMientras
+
+		CERRAR(arch); CERRAR(sal)
+FIN_ACCION
+================================================================================================================
+
+ACCION Ejer_2_3_5 ES
+	AMBIENTE
+		Fecha = Registro
+			anio: N(4)
+			mes: 1...12
+			dia: 1...31
+		FinRegistro
+
+		Alumno = Registro
+			apellido_nombre: AN
+			carrera = ("ISI", "IQ", "IEM")
+			legajo: N(5)
+			fecha_nacimiento: Fecha
+			fecha_ingreso: Fecha
+			dni: N(8)
+			sexo = ("F", "M")
+			fecha_ult_examen_aprob: Fecha
+			nota: N(1.2)
+		FinRegistro
+
+		arch: Archivo de Alumno
+		al: Alumno
+
+		anio_actual: N(4)
+
+	PROCESO
+		ABRIR E/ (arch)
+		LEER(arch, al)
+		
+		ESCRIBIR("Ingrese el año actual: ")
+		LEER(anio_actual)
+
+		Mientras NFDA(arch) hacer
+			Si ((anio_actual-al.fecha_ingreso.anio)=1) y (al.nota>7) entonces
+				ESCRIBIR("| ", al.legajo, " | ", al.apellido_nombre, " | ", al.carrera, " |")
+			FinSi
+			LEER(arch, al)
+		FinMientras
+		
+		CERRAR(arch)
 FIN_ACCION
 
 ================================================================================================================
@@ -1212,7 +1366,151 @@ FIN_ACCION
 
 ACCION Ejer_2_3_7 ES
 	AMBIENTE
-		
+		Persona = Registro
+			nombre_apellido: AN(40)
+			clase: N(4)
+			dni: N(8)
+			direccion: AN(30)
+			nro_mesa: entero
+			observaciones: AN(200)
+			nro_circuito: entero
+			partido = 0...3
+		FinRegistro
+
+		Persona_sal = Registro
+			nombre_apellido: AN(40)
+			dni: N(8)
+			direccion: AN(30)
+		FinRegistro
+
+		padron: Archivo de Persona
+		sal1: Archivo de Persona
+		sal2: Archivo de Persona
+		pers: Persona
+		p_sal: Persona_sal
+
 	PROCESO
-		
+		ABRIR E/ (padron)
+		ABRIR /S (sal1)
+		ABRIR /S (sal2)
+		LEER(padron, pers)
+
+		Mietras NFDA(padron) hacer
+			Si pers.partido=3 entonces
+				p_sal.nombre_apellido := pers.nombre_apellido
+				p_sal.dni := pers.dni
+				p_sal.direccion := pers.direccion
+				ESCRIBIR(sal1, p_sal)
+
+			Sino
+				Si (pers.partido=0) y (pers.clase>1940) entonces 
+					p_sal.nombre_apellido := pers.nombre_apellido
+					p_sal.dni := pers.dni
+					p_sal.direccion := pers.direccion
+					ESCRIBIR(sal2, p_sal)
+			FinSi
+
+			LEER(padron, pers)
+		FinMientras
+
+		CERRAR(padron); CERRAR(sal1); CERRAR(sal2)
 FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejer_2_3_8 ES
+	AMBIENTE
+		Fecha = Registro
+			anio: N(4)
+			mes: 1...12
+			dia: 1...31
+		FinRegistro
+
+		Compra = Registro
+			nro_cliente: entero
+			fecha_ult_compra: Fecha
+			monto: real
+		FinRegistro
+
+		Cliente = Registro
+			nro_cliente: entero
+			apellido_nombre: AN(40)
+			domicilio: AN(100)
+			telefono: N(10)
+			dni: N(8)
+		FinRegistro
+
+		compras: Archivo de Compra ordenado por nro_cliente
+		clientes: Archivo de Cliente ordenado por nro_cliente
+		com: Compra
+		cli: Cliente
+
+		fech: Fecha
+		montox: real
+
+	PROCESO
+		ABRIR E/ (compras); ABRIR E/ (clientes)
+		LEER(compras, com); LEER(clientes, cli)
+
+		ESCRIBIR("Ingrese la fecha deseada en formato: DD MM AAAA")
+		LEER(fech.dia, fech.mes, fech.anio)
+		ESCRIBIR("Ingrese el monto deseado: ")
+		LEER(montox)
+
+		Mientras NFDS(compras) hacer
+			Si (com.fecha_ult_compra>fech) y (com.monto>montox) entonces
+				ESCRIBIR("| ", cli.apellido_nombre, " | ", com.fecha_ult_compra.dia, "-", com.fecha_ult_compra.mes, "-", com.fecha_ult_compra.anio, " | ", com.monto, " |")
+			FinSi
+			LEER(compras, com); LEER(clientes, cli)
+		FinMientras
+
+		CERRAR(compras); CERRAR(clientes)
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejer_2_3_9 ES
+	AMBIENTE
+		Producto = Registro
+			cod_producto: entero
+			tipo = (1, 2, 3)
+			marca: AN(15)
+			modelo: AN(15)
+			descripcion: AN(200)
+			cant_existente: entero
+			precio_unit: real
+		FinRegistro
+
+		arch: Archivo de Producto
+		sal: Archivo de Producto
+		prod: Producto
+
+		tipo1: entero; tipo2: entero; tipo3: entero
+
+	PROCESO
+		ABRIR E/ (arch); ABRIR /S (sal)
+		LEER(arch, prod)
+
+		tipo1 := 0; tipo2 := 0; tipo3 := 0
+
+		Mientras NFDA(arch) hacer
+			Segun prod.tipo hacer
+				1:	prod.precio_unit := prod.precio_unit*1.1
+					tipo1 := tipo1 + 1
+				2:	prod.precio_unit := prod.precio_unit*1.25
+					tipo2 := tipo2 + 1
+				3:	prod.precio_unit := prod.precio_unit*1.5
+					tipo3 := tipo3 + 1
+			FinSegun
+			ESCRIBIR(sal, prod)
+			LEER(arch, prod)
+		FinMientras
+
+		ESCRIBIR("La cantidad de articulos de tipo 1 es de: ", tipo1)
+		ESCRIBIR("La cantidad de articulos de tipo 2 es de: ", tipo2)
+		ESCRIBIR("La cantidad de articulos de tipo 3 es de: ", tipo3)
+
+		CERRAR(arch); CERRAR(sal)
+FIN_ACCION
+
+================================================================================================================
