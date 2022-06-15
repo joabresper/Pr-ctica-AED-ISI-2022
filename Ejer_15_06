@@ -1,0 +1,100 @@
+ACCION Ejer_15_06 ES
+	AMBIENTE
+		Usuario = Registro
+			sucursal: N(4)
+			area: N(4)
+			identificador: N(8)
+			nombre_completo: AN(150)
+			fecha_de_ultimo_login = Registro
+				anio: N(4)
+				mes: 1...12
+				dia: 1...31
+			FinRegistro
+		FinRegistro
+
+		Usuario_sal = Registro
+			sucursal: N(4)
+			area: N(4)
+			cantidad: N(3)
+		FinRegistro
+
+		arch: Archivo de Usuario
+		sal: Archivo de Usuario_sal
+		u: Usuario
+		u_sal: Usuario_sal
+
+		cant_area: entero
+		cant_sucursal: entero
+		cant_total: entero
+		dias_inact_area: entero
+		dias_inact_sucursal: entero
+		dias_inact_total: entero
+
+		PROCEDIMIENTO corte_area() ES
+			PROCESO
+				u_sal.sucursal := resg_sucursal
+				u_sal.area := resg_area
+				u_sal.cantidad := cant_area
+				ESCRIBIR(sal, u_sal)
+				ESCRIBIR("La cantidad de usuarios a eliminar en el area ", resg_area, " es de: ", cant_area)
+				ESCRIBIR("El promedio de dias de inactividad de los mismos es de: ", dias_inact_area/cant_area)
+
+				cant_sucursal := cant_sucursal + cant_area
+				dias_inact_sucursal := dias_inact_sucursal + dias_inact_area
+
+				resg_area := u.area
+				cant_area := 0
+		FIN_PROCEDIMIENTO
+
+		PROCEDIMIENTO corte_sucursal() ES
+			PROCESO
+				corte_area()
+				ESCRIBIR("La cantidad de usuarios a eliminar en la sucursal ", resg_sucursal, " es de: ", cant_sucursal)
+				ESCRIBIR("El promedio de dias de inactividad de los mismos es de: ", dias_inact_sucursal/cant_sucursal)
+
+				cant_total := cant_total + cant_sucursal
+				dias_inact_total := dias_inact_total + dias_inact_sucursal
+
+				resg_sucursal := u.sucursal
+				cant_sucursal := 0
+		FIN_PROCEDIMIENTO
+
+	PROCESO
+		ABRIR E/ (arch)
+		ABRIR /S (sal)
+		LEER(arch, u)
+
+		resg_area := u.area
+		resg_sucursal := u.sucursal
+
+		cant_area, cant_sucursal, cant_total := 0
+		dias_inact_area, dias_inact_sucursal, dias_inact_total := 0
+
+		Mientras NFDA(arch) hacer
+			# Evaluacion de cortes
+			Si resg_sucursal <> u.sucursal entonces
+				corte_sucursal()
+			Sino
+				Si resg_area <> u.area entonces
+					corte_area()
+				FinSi
+			FinSi
+
+			# Evaluacion de condicion
+			Si diff_fecha(fecha_actual(), u.fecha_de_ultimo_login)>50 entonces
+				cant_area := cant_area + 1
+				dias_inact_area := dias_inact_area + diff_fecha(u.fecha_de_ultimo_login, fecha_actual())
+			FinSi
+
+			# Leer registro
+			LEER(arch, u)
+		FinMientras
+
+		# Emision de totales
+		corte_sucursal()
+		ESCRIBIR("El total de usuarios a eliminar es de: ", cant_total)
+		ESCRIBIR("El promedio de dias de inactividad del total de ususarios es de: ", dias_inact_total/cant_total)
+
+		# Cerrar archivos
+		CERRAR(arch); CERRAR(sal)
+FIN_ACCION

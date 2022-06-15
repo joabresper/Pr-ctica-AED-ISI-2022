@@ -1481,7 +1481,7 @@ ACCION Ejer_2_3_9 ES
 			precio_unit: real
 		FinRegistro
 
-		arch: Archivo de Producto
+		arch: Archivo de Producto ordenado por cod_producto
 		sal: Archivo de Producto
 		prod: Producto
 
@@ -1511,6 +1511,438 @@ ACCION Ejer_2_3_9 ES
 		ESCRIBIR("La cantidad de articulos de tipo 3 es de: ", tipo3)
 
 		CERRAR(arch); CERRAR(sal)
+FIN_ACCION
+
+================================================================================================================
+----------------------------------- CORTE DE CONTROL -----------------------------------------------------------
+================================================================================================================
+
+ACCION Ejer_2_3_10 ES
+	AMBIENTE
+		Fecha = Registro
+			anio: N(4)
+			mes: 1...12
+			dia: 1...31
+		FinRegistro
+
+		Alumno = Registro
+			apellido_nombre: AN
+			carrera = ("ISI", "IQ", "IEM", "LAR")
+			legajo: N(5)
+			fecha_nacimiento: Fecha
+			fecha_ingreso: Fecha
+			dni: N(8)
+			sexo = ("F", "M")
+			fecha_ult_examen_aprob: Fecha
+			nota: N(1.2)
+		FinRegistro
+
+		PROCEDIMIENTO corte() ES
+			PROCESO
+				ESCRIBIR("La cantidad de alumnos en la carrera de ", resg_carrera, " es de: ", cant)
+				total := total + cant
+				cant := 0
+				resg_carrera := al.carrera
+		FIN_PROCEDIMIENTO
+
+		arch: Archivo de Alumno ordenado por carrera
+		al: Alumno
+
+		resg_carrera = ("ISI", "IQ", "IEM", "LAR")
+		cant: entero
+
+	PROCESO
+		ABRIR E/ (arch)
+		LEER(arch, al)
+
+		cant := 0; total := 0
+		resg_carrera := al.carrera
+
+		Mientras NFDA(arch) hacer
+			Si al.carrera<>resg_carrera entonces
+				corte()
+			FinSi
+
+			cant := cant + 1
+			LEER(arch, al)
+		FinMientras
+
+		corte()
+		ESCRIBIR("El total de alumnos es de: ", total)
+		CERRAR(arch)
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejer_2_3_11 ES
+	AMBIENTE
+		Alumno = Registro
+			sexo = ("F", "M")
+			carrera = ("ISI", "IQ", "IEM", "LAR")
+			legajo: N(5)
+			fecha_ingreso = Registro
+				anio: N(4)
+				mes: 1...12
+				dia: 1...31
+			FinRegistro
+			total_materias_aprob: entero
+		FinRegistro
+
+		arch: Archivo de Alumno ordenado por sexo, carrera, legajo
+		al: Alumno
+
+		resg_sexo = ("F", "M")
+		resg_carrera = ("ISI", "IQ", "IEM", "LAR")
+		cant_carrera_menor_20: entero
+		cant_carrera_mayor_20: entero
+		cant_sexo_mayor_20: entero
+		cant_sexo_menor_20: entero
+		total_mayor_20: entero
+		total_menor_20: entero
+
+		PROCEDIMIENTO corte1() ES
+			PROCESO
+				ESCRIBIR("El total de alumnos ingresados en el año 2009 con mas de 20 materias aprobadas en la carrera de ", resg_carrera, " es de: ", cant_carrera_mayor_20)
+				ESCRIBIR("El total de alumnos ingresados en el año 2009 con menos de 20 materias aprobadas en la carrera de ", resg_carrera, " es de: ", cant_carrera_menor_20)
+				cant_sexo_mayor_20 := cant_sexo_mayor_20 + cant_carrera_mayor_20
+				cant_sexo_menor_20 := cant_sexo_menor_20 + cant_carrera_menor_20
+				cant_carrera_menor_20 := 0
+				cant_carrera_mayor_20 := 0
+				resg_carrera := al.carrera
+		FIN_PROCEDIMIENTO
+
+		PROCEDIMIENTO corte2() ES
+			PROCESO
+				corte1()
+				ESCRIBIR("El total de alumnos ingresados en el año 2009 con mas de 20 materias aprobadas de sexo ", resg_sexo, " es de: ", cant_sexo)
+				ESCRIBIR("El total de alumnos ingresados en el año 2009 con menos de 20 materias aprobadas de sexo ", resg_sexo, " es de: ", cant_sexo)
+				total_mayor_20 := total_mayor_20 + cant_sexo_mayor_20
+				total_menor_20 := total_menor_20 + cant_sexo_menor_20
+				cant_sexo_mayor_20 := 0
+				cant_sexo_menor_20 := 0
+				resg_sexo := al.sexo
+		FIN_PROCEDIMIENTO
+
+	PROCESO
+		ABRIR(arch); LEER(arch, al)
+
+		resg_sexo := al.sexo; resg_carrera := al.carrera
+		
+		cant_carrera_mayor_20 := 0; cant_carrera_menor_20 := 0
+		cant_sexo_mayor_20 := 0; cant_sexo_menor_20 := 0
+		total_mayor_20 := 0; total_menor_20 := 0
+
+		Mientras NFDA(arch) hacer
+			Si al.sexo<>resg_sexo entonces
+				corte2()
+			Sino
+				Si al.carrera<>resg_carrera entonces
+					corte1()
+				FinSi
+			FinSi
+
+			Si al.fecha_ingreso.anio=2009 entonces
+				Segun al.total_materias_aprob hacer
+					<20:	cant_carrera_menor_20 := cant_carrera_menor_20 + 1
+					>20:	cant_carrera_mayor_20 := cant_carrera_mayor_20 + 1
+				FinSegun
+			FinSi
+
+			LEER(arch, al)
+		FinMientras
+
+		corte2()
+		ESCRIBIR("El total de alumnos ingresados en el año 2009 con menos de 20 materias aprobadas es de: ", total_menor_20)
+		ESCRIBIR("El total de alumnos ingresados en el año 2009 con mas de 20 materias aprobadas es de: ", total_mayor_20)
+		CERRAR(arch)
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejer_2_3_12 ES
+	AMBIENTE
+		Casa = Registro
+			provincia: AN(50)
+			departamento: AN(50)
+			ciudad: AN(50)
+			barrio: AN(50)
+			id_casa: entero
+			habitantes: entero
+		FinRegistro
+
+		Casa_sal = Registro
+			provincia: AN(50)
+			departamento: AN(50)
+			cant_habitantes: entero
+		FinRegistro
+
+		arch: Archivo de Casa ordenado por provincia, departamento, ciudad, barrio, id_casa
+		sal: Archivo de Casa_sal 
+		c: Casa
+		c_sal: Casa_sal
+
+		resg_provincia: AN(50)
+		resg_departamento: AN(50)
+		habitantes_depto: entero
+
+		PROCEDIMIENTO corte_departamento() ES
+			PROCESO
+				c_sal.provincia := resg_provincia
+				c_sal.departamento := resg_departamento
+				c_sal.cant_habitantes := habitantes_depto
+				ESCRIBIR(sal, c_sal)
+
+				habitantes_depto := 0
+				resg_departamento := c.departamento
+		FIN_PROCEDIMIENTO
+
+		PROCEDIMIENTO corte_provincia() ES
+			PROCESO
+				corte_departamento()
+				resg_provincia := c.provincia
+		FIN_PROCEDIMIENTO
+
+	PROCESO
+		ABRIR E/ (arch); ABRIR /S (sal)	
+		LEER(arch, c)
+
+		resg_provincia := c.provincia
+		resg_departamento := c.departamento
+
+		Mientras NFDA(arch) hacer
+			Si resg_provincia<>c.provincia entonces
+				corte_provincia()
+			Sino
+				Si resg_departamento<>c.departamento entonces
+					corte_departamento()
+				FinSi
+			FinSi
+
+			habitantes_depto := habitantes_depto + 1
+			LEER(arch, c)
+		FinMientras
+
+		corte_provincia()
+		CERRAR(arch); CERRAR(sal)
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejer_2_3_13 ES
+	AMBIENTE
+		Reparacion = Registro
+			cod_sucursal: entero
+			marca: AN(20)
+			modelo: AN(20)
+			cod_tragamonedas: entero
+			fecha_reparacion = Registro
+				anio: N(4)
+				mes: 1...12
+				dia: 1...31
+			FinRegistro
+			costo_reparacion: real
+		FinRegistro
+
+		arch: Archivo de Reparacion
+		rep: Reparacion
+
+		resg_tragamonedas: entero
+		resg_modelo: AN(20)
+		resg_marca: AN(20)
+		resg_sucursal: entero
+
+		rep_tragamonedas: entero; rep_modelo: entero; rep_marca: entero; rep_sucursal: entero; rep_total: entero
+		costo_tragamonedas: real; costo_modelo: real; costo_marca: real; costo_sucursal: real; costo_total: real
+		
+		PROCEDIMIENTO corte_tragamonedas() ES
+			PROCESO
+				ESCRIBIR("El tragamonedas ", resg_tragamonedas, " tuvo ", rep_tragamonedas, " reparaciones, con un costo total de $", costo_tragamonedas)
+				
+				rep_modelo := rep_modelo + rep_tragamonedas
+				costo_modelo := costo_modelo + costo_tragamonedas
+				resg_tragamonedas := rep.cod_tragamonedas
+				
+				rep_tragamonedas := 0
+				costo_tragamonedas := 0 
+		FIN_PROCEDIMIENTO
+
+		PROCEDIMIENTO corte_modelo() ES
+			PROCESO
+				corte_tragamonedas()
+				ESCRIBIR("El modelo de tragamonedas ", resg_mdoelo, " tuvo un total de ", rep_modelo, " reparaciones, con un costo de $", costo_modelo)
+
+				rep_marca := rep_marca + rep_modelo
+				costo_marca := costo_marca + costo_modelo
+				resg_modelo := rep.modelo
+
+				rep_modelo := 0
+				costo_modelo := 0
+		FIN_PROCEDIMIENTO
+
+		PROCEDIMIENTO corte_marca() ES
+			PROCESO
+				corte_modelo()
+				ESCRIBIR("La marca de tragamonedas ", resg_marca, " tuvo un total de ", rep_marca, " reparaciones, con un costo de $", costo_marca)
+
+				rep_sucursal := rep_sucursal + rep_marca
+				costo_sucursal := costo_sucursal + costo_marca
+				resg_marca := rep.marca
+
+				rep_marca := 0
+				costo_marca := 0
+		FIN_PROCEDIMIENTO
+
+		PROCEDIMIENTO corte_sucursal() ES
+			PROCESO
+				corte_marca()
+				ESCRIBIR("En la sucursal ", resg_sucursal, " hubo un total de ", rep_sucursal, " reparaciones, con un costo de $", costo_sucursal)
+
+				rep_total := rep_total + rep_sucursal
+				costo_total := costo_total + costo_sucursal
+				resg_sucursal := rep.cod_sucursal
+
+				rep_sucursal := 0
+				costo_sucursal := 0
+		FIN_PROCEDIMIENTO
+
+	PROCESO
+		ABRIR(arch); LEER(arch, rep)
+
+		rep_tragamonedas := 0; rep_modelo := 0; rep_modelo := 0; rep_sucursal := 0; rep_total := 0
+		costo_tragamonedas := 0; costo_modelo := 0; costo_marca := 0; costo_sucursal := 0; costo_total := 0
+
+		resg_sucursal := rep.sucursal
+		resg_marca := rep.marca
+		resg_modelo := rep.modelo
+		resg_tragamonedas := rep.cod_tragamonedas
+
+		Mientras NFDA(arch) hacer
+			Si rep.sucursal <> resg_sucursal entonces
+				corte_sucursal()
+			Sino
+				Si rep.marca <> resg_marca entonces
+					corte_marca()
+				Sino
+					Si rep.modelo <> resg_mdoelo entonces
+						corte_modelo()
+					Sino
+						Si rep.cod_tragamonedas <> resg_tragamonedas entonces
+							corte_tragamonedas()
+						FinSi
+					FinSi
+				FinSi
+			FinSi
+
+			rep_tragamonedas := rep_tragamonedas + 1
+			costo_tragamonedas := costo_tragamonedas + rep.costo_reparacion
+			LEER(arch, rep)
+		FinMientras
+
+		corte_sucursal()
+		ESCRIBIR("El total de reparaciones es de ", rep_total, ", con un costo de $", costo_total)
+		CERRAR(arch)
+FIN_ACCION
+
+================================================================================================================
+# HECHO EN LA CARPETA - COPIAR	
+ACCION Ejer_2_3_14 ES
+	AMBIENTE
+		
+	PROCESO
+		
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejer_2_3_15 ES
+	AMBIENTE
+		Alulmno = Registro
+			escuela: AN(20)
+			anio: N(1)
+			division: AN(1)
+			nombre: AN(20)
+			inasistencias: entero
+		FinRegistro
+		
+		arch: Archivo de Alumno ordenado por escuela, anio, division
+		al: Alumno
+
+		distrito: entero
+		dias_clase: entero
+
+		al_lib_anio: entero
+		al_reg_anio: entero
+		al_lib_total: entero
+
+		cant_al_division: entero
+		cant_al_anio: entero
+		cant_al_total: entero
+
+		PROCEDIMIENTO corte_division() ES
+			PROCESO
+				ESCRIBIR("Cantidad de alumnos en la division ", resg_division, ": ", cant_al_division)
+				cant_al_anio := cant_al_anio + cant_al_division
+				resg_division := al.division
+				cant_al_division := 0
+		FIN_PROCEDIMIENTO
+
+		PROCEDIMIENTO corte_anio() ES
+			PROCESO
+				corte_division()
+				ESCRIBIR("Cantidad de alumnos libres del año ", resg_anio, ": ", al_lib_anio)
+				ESCRIBIR("Cantidad de alumnos regulares del año ", resg_anio, ": ", al_reg_anio)
+				ESCRIBIR("Cantidad total de alumnos del año ", resg_anio, ": ", cant_al_anio)
+
+				cant_al_total := cant_al_total + cant_al_anio
+				resg_anio := al.anio
+				cant_al_anio := 0
+		FIN_PROCEDIMIENTO
+
+	PROCESO
+		ABRIR(arch); LEER(arch, al)
+
+		al_lib_anio, al_reg_anio, al_lib_total := 0
+		cant_al_division, cant_al_anio, cant_al_total := 0
+
+		resg_division := al.division
+		resg_anio := al.anio
+		resg_escuela := al.escuela
+
+		ESCRIBIR("Ingrese el numero del distrito: "); LEER(distrito)
+		ESCRIBIR("Ingrese el numero de dias de clases dictados en el año: "); LEER(dias_clase)
+
+		Mientras NFDA(arch) hacer
+			# Tratar corte
+			Si al.escuela <> resg_escuela entonces
+				corte_anio()
+			Sino
+				Si al.anio <> resg_anio entonces
+					corte_anio()
+				Sino
+					Si al.division <> resg_division entonces
+						corte_division()
+					FinSi
+				FinSi
+			FinSi
+
+			# Tratar registro
+			cant_al_division := cant_al_division + 1
+			inasistencias := inasistencias + al.inasistencias
+			Si (al.inasistencias/dias_clase)>0.2 entonces
+				al_lib_anio := al_lib_anio + 1
+			Sino
+				al_reg_anio := al_reg_anio + 1
+			FinSi
+
+			# Llamar corte mayor
+			corte_anio()
+
+			# Emitir totales
+			ESCRIBIR("La cantidad total de alumnos en el distrito ", distrito, " es de ", cant_al_total)
+			ESCRIBIR("El porcentaje de alumnos libres es de ", ((cant_al_lib/cant_al_total)*100), "%")
+			ESCRIBIR("El promedio de inasistencias por alumno es de ", (inasistencias DIV cant_al_total))
+
+			CERRAR(arch)
 FIN_ACCION
 
 ================================================================================================================
