@@ -1847,9 +1847,66 @@ FIN_ACCION
 # HECHO EN LA CARPETA - COPIAR	
 ACCION Ejer_2_3_14 ES
 	AMBIENTE
-		
+		Vivienda = Registro
+			radio: entero
+			manzana: entero
+			nro_vivienda: entero
+			condicion_vivienda: ("Muy Buena", "Buena", "Mala")
+			cant_habitantes: entero
+		FinRegistro
+
+		censo: Archivo de Vivienda ordenado por radio, manzana, nro_vivienda
+		v: Vivienda
+
+		resg_manzana: entero; resg_radio: entero
+		total_manzana: entero; total_radio: entero; total_ciudad: entero
+
+		PROCEDIMIENTO corte_manzana() ES
+			PROCESO
+				ESCRIBIR("El total de habitantes en la manzana ", resg_manzana, " que vive en condicion 'Muy Buena' es de: ", total_manzana)
+
+				total_radio := total_radio + total_manzana
+				total_manzana := 0
+				resg_manzana := v.manzana
+		FIN_PROCEDIMIENTO
+
+		PROCEDIMIENTO corte_radio() ES
+			PROCESO
+				corte_manzana()
+				ESCRIBIR("El total de habitantes en el radio ", resg_radio, " que vive en condicion 'Muy Buena' es de: ", total_radio)
+
+				total_ciudad := total_ciudad + total_radio
+				total_radio := 0
+				resg_radio := v.radio
+		FIN_PROCEDIMIENTO
+
 	PROCESO
-		
+		ABRIR E/ (censo); LEER(censo, v)
+
+		resg_manzana := v.manzana
+		resg_radio := v.radio
+
+		total_ciudad, total_radio, total_manzana := 0
+
+		Mientras NFDA(censo) hacer
+			Si resg_radio<>v.radio entonces
+				corte_radio()
+			Sino
+				Si resg_manzana<>v.manzana entonces
+					corte_manzana()
+				FinSi
+			FinSi
+
+			Si v.condicion_vivienda="Muy Buena" entonces
+				total_manzana := total_manzana + v.cant_habitantes
+			FinSi
+
+			LEER(censo, v)
+		FinMientras
+
+		corte_radio()
+		ESCRIBIR("El total de habitantes en la ciudad que vive en condicion 'Muy Buena' es de: ", total_ciudad)
+		CERRAR(censo)
 FIN_ACCION
 
 ================================================================================================================
