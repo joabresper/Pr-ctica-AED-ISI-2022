@@ -1,0 +1,99 @@
+ACCION Modelo_2 ES
+	AMBIENTE
+		sec: Secuencia de caracter
+		v: caracter
+
+		cant_letras: N(3)
+		cant_por_lab: entero
+		cant_total: entero
+		id_caracter: AN(1)
+		linea: ("A", "G", "R")
+
+		FUNCION Nro_1al9_a_caracter(nro: N(2)): AN(1) ES
+			AMBIENTE
+				id: N(1)
+			PROCESO
+				Si nro<10 entonces
+					id := nro
+				Sino
+					id := (nro DIV 10) + (nro MOD 10)
+				FinSi
+
+				Segun id hacer
+					1:	Nro_en_caracter := "1"
+					2:	Nro_en_caracter := "2"
+					3:	Nro_en_caracter := "3"
+					4:	Nro_en_caracter := "4"
+					5:	Nro_en_caracter := "5"
+					6:	Nro_en_caracter := "6"
+					7:	Nro_en_caracter := "7"
+					8:	Nro_en_caracter := "8"
+					9:	Nro_en_caracter := "9"
+				FinSegun
+		FIN_FUNCION
+
+	PROCESO
+		ARRANCAR(sec); AVANZAR(sec, v)
+
+		ESCRIBIR("Indique la letra correspondiente a la linea terapeutica de los productos que desea consultar: ")
+		ESCRIBIR("(A) Antiinflamatorio")
+		ESCRIBIR("(G) Gastroenterologica")
+		ESCRIBIR("(R) Respitatoria/Antialergica")
+		LEER(linea)
+
+		Mientras NFDS(sec) hacer
+			# Escribir y Avanzar nombre laboratorio
+			Mientras NFDS(sec) y v<>"-" hacer
+				ESCRIBIR("Laboratorio: ", v)
+				AVANZAR(sec, v)
+			FinMientras
+			# Resetear contador de productos por laboratorio
+			cant_por_lab := 0
+			# Avanzar guion
+			AVANZAR(sec, v)
+			# Tratar productos
+			Mientras NFDS(sec) y v<>"@" hacer
+				# Escribir productos de la linea. Caso contrario, avanzarlos
+				Si v=linea entonces
+					# Contar producto
+					cant_por_lab := cant_por_lab + 1
+					# Avanzar caracter indicador de la linea elegida
+					AVANZAR(sec, v)
+					# Resetear contador de letras
+					cant_letras := 0
+					# Escribir nombre del producto y actualizar contador
+					Mientras v<>"@" y v<>" " hacer
+						cant_letras := cant_letras + 1
+						ESCRIBIR(sec, v)
+						AVANZAR(sec, v)
+					FinMientras
+					# Escribir caracter verificador
+					id_caracter := Nro_1al9_a_caracter(cant_letras)
+					ESCRIBIR(sec, id_caracter)
+					# Escribir espacio en blanco
+					ESCRIBIR(sec, " ")
+				Sino
+					Mientras v<>"@" y v<>" " hacer
+						AVANZAR(sec, v)
+					FinMientras
+				FinSi
+
+				# Avanzar blancos finales
+				Mientras v<>"@" y v=" " hacer
+					AVANZAR(sec, v)
+				FinMientras
+			FinMientras
+
+			# Informar cantidad de productos de la linea por laboratorio
+			ESCRIBIR("Cantidad de productos de la linea '", linea, "': ", cant_por_lab)
+			# Acumular total
+			cant_total := cant_total + cant_por_lab
+
+			# Avanzar simbolo arroba
+			AVANZAR(sec, v)
+		FinMientras
+		# Informar cantidad total de productos de la linea
+		ESCRIBIR("Total General de productos de la linea '", linea, "': ", cant_total)
+
+		CERRAR(sec)
+FIN_ACCION
