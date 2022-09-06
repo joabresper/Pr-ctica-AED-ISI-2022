@@ -2003,3 +2003,396 @@ ACCION Ejer_2_3_15 ES
 FIN_ACCION
 
 ================================================================================================================
+
+ACCION Ejer_2_3_16 ES
+	AMBIENTE
+		Fecha = Registro
+			anio: N(4)
+			mes: 1..12
+			dia: 1..31
+		FinRegistro
+
+		Pelicula = Registro
+			nro_pelicula: entero
+			titulo: AN(20)
+			genero: AN(20)
+			cant_copias: entero
+			fecha_estreno: Fecha
+		FinRegistro
+
+		peliculas: Archivo de Pelicula ordenado por nro_pelicula
+		peliculas_nuevas: Archivo de Pelicula ordenado por nro_pelicula
+		peliculas_sal: Archivo de Pelicula
+
+		r_pel: Pelicula
+		r_pel_nuev: Pelicula
+
+		HV = 999999
+
+		PROCEDIMIENTO leer_peliculas() ES
+			LEER(peliculas, r_pel)
+			Si FDA(peliculas) entonces
+				r_pel.nro_pelicula := HV
+			FinSi
+		FIN_PROCEDIMIENTO
+
+		PROCEDIMIENTO leer_peliculas_nuevas() ES
+			LEER(peliculas_nuevas, r_pel_nuev)
+			Si FDA(peliculas_nuevas) entonces
+				r_pel_nuev.nro_pelicula := HV
+			FinSi
+		FIN_PROCEDIMIENTO
+
+	PROCESO
+		ABRIR E/(peliculas); ABRIR E/(peliculas_nuevas); ABRIR /S(peliculas_sal)
+
+		leer_peliculas(); leer_peliculas_nuevas()
+		
+		# Ciclo Incluyente
+		Mientras (r_pel.nro_pelicula<>HV) o (r_pel_nuev.nro_pelicula<>HV) hacer
+			Si r_pel.nro_pelicula<r_pel_nuev.nro_pelicula entonces
+				ESCRIBIR(peliculas_sal, r_pel)
+				leer_peliculas()
+			Sino
+				ESCRIBIR(peliculas_sal, r_pel_nuev)
+				leer_peliculas_nuevas()
+			FinSi
+		FinMientras
+
+		CERRAR(peliculas); CERRAR(peliculas_nuevas); CERRAR(peliculas_sal)
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejer_2_3_17 ES
+	AMBIENTE
+		Fecha = Registro
+			anio: N(4)
+			mes: 1..12
+			dia: 1..31
+		FinRegistro
+
+		Aspirante = Registro
+			dni: N(8)
+			ape_nom: AN(50)
+			carrear: ("IQ", "ISI", "IEM", "LAR")
+			f_nac: Fecha
+			email: AN(50)
+			colegio_sec: AN(50)
+			f_inscripcion: Fecha
+			aprobado: booleano
+		FinRegistro
+
+		Seguimiento = Registro
+			dni: N(8)
+			ape_nom: AN(50)
+			email: AN(50)
+			colegio_sec: AN(50)
+		FinRegistro
+
+		HV = 99999999999
+
+		Aago: Archivo de Aspirante ordenado por dni
+		Afeb: Archivo de Aspirante ordenado por dni
+		Asal: Archivo de Seguimiento
+
+		Rago: Aspirante
+		Rfeb: Aspirante
+		Rsal: Seguimiento
+
+		cant_desaprobados: entero
+
+		PROCEDIMIENTO leer_registro(archivo, registro) ES
+			LEER(archivo, registro)
+			Si FDA(archivo) entonces
+				registro.dni := HV
+			FinSi
+		FIN_PROCEDIMIENTO
+
+		PROCEDIMIENTO grabar_reg_salida(reg) ES
+			Rsal.dni := reg.dni
+			Rsal.ape_nom := reg.ape_nom
+			Rsal.email := reg.email
+			Rsal.colegio_sec := reg.colegio_sec
+		FIN_PROCEDIMIENTO
+
+	PROCESO
+		abrir_archivos()
+		leer_registro(Aago, Rago); leer_registro(Afeb, Rfeb)
+
+		cant_desaprobados := 0
+
+		// Ciclo incluyente
+		Mientras (Rago.dni<>HV) o (Rfeb.dni<>HV) hacer
+			Segun Rago.dni hacer
+				<Rfeb.dni:	Si no Rago.aprobado entonces
+								grabar_reg_salida(Rago)
+								ESCRIBIR(Asal, Rsal)
+								cant_desaprobados := cant_desaprobados+1
+							FinSi
+							leer_registro(Aago, Rago)
+
+				=Rfeb.dni:	Si (no Rago.aprobado y no Rfeb.aprobado) entonces
+								grabar_reg_salida(Rago)
+								ESCRIBIR(Asal, Rsal)
+							FinSi
+							leer_registro(Aago, Rago)
+							leer_registro(Afeb, Rfeb)
+
+				>Rfeb.dni:	Si no Rfeb.aprobado entonces
+								grabar_reg_salida(Rfeb)
+								ESCRIBIR(Asal, Rsal)
+							FinSi
+							leer_registro(Afeb, Rfeb)
+			FinSegun
+		FinMientras
+		
+		cerrar_archivos()
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejer_2_4_1a ES
+	AMBIENTE
+		Factura = Registro
+			nro_cliente: entero
+			nro_factura: entero
+			fecha: Fecha
+			importe: real
+		FinRegistro
+
+		Cliente = Registro
+			nro_cliente: entero
+			nombre: AN(40)
+			dni: N(8)
+			cuit: N(11)
+			domicilio: AN(40)
+		FinRegistro
+
+		Afac: Archivo de Factura ordenado por nro_cliente, nro_factura
+		Acli: Archivo de Cliente indexado por nro_cliente
+		Rfac: Factura
+		Rcli: Cliente
+
+	PROCESO
+		ABRIR E/(Afac); ABRIR E/(Acli)
+		LEER(Afac, Rfac)
+
+		Mientras NFDA(Afac) hacer
+			ESCRIBIR("Nro de cliente: ", Rfac.nro_cliente)
+
+			Rcli.nro_cliente := Rfac.nro_cliente
+			LEER(Acli, Rcli)
+
+			Si EXISTE entonces
+				ESCRIBIR("Nombre: ", Rcli.nombre)
+			Sino
+				ESCRIBIR("ERROR - Cliente no encontrado")
+			FinSi
+
+			ESCRIBIR("Nro de factura: ", Rfac.nro_factura)
+
+			LEER(Afac, Rfac)
+		FinMientras
+
+		CERRAR(Afac); CERRAR(Acli)
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejer_2_4_1b ES
+	AMBIENTE
+		Factura = Registro
+			nro_cliente: entero
+			nro_factura: entero
+			fecha: Fecha
+			importe: real
+		FinRegistro
+
+		Cliente = Registro
+			nro_cliente: entero
+			nombre: AN(40)
+			dni: N(8)
+			cuit: N(11)
+			domicilio: AN(40)
+		FinRegistro
+
+		Afac: Archivo de Factura ordenado por nro_cliente, nro_factura
+		Acli: Archivo de Cliente indexado por nro_cliente
+		Rfac: Factura
+		Rcli: Cliente
+
+		resg_cli: entero
+		total_facturado: real
+		total_facturas: entero
+
+		PROCEDIMIENTO corte_cliente() ES
+			PROCESO
+				Rcli.nro_cliente := resg_cli
+				LEER(Acli, Rcli)
+				Si EXISTE entonces
+					ESCRIBIR("Nro de cliente: ", resg_cli)
+					ESCRIBIR("Nombre de cliente: ", Rcli.nombre)
+					ESCRIBIR("Total facturado: $", total_facturado)
+					ESCRIBIR("Cantidad de facturas: ", total_facturas)
+				Sino
+					ESCRIBIR("ERROR - Cliente no encontrado")
+				FinSi
+
+				total_facturado := 0
+				total_facturas := 0
+				resg_cli := Rfac.nro_cliente
+		FIN_PROCEDIMIENTO
+
+	PROCESO
+		ABRIR E/(Afac); ABRIR E/(Acli)
+		LEER(Afac, Rfac)
+
+		resg_cli := Rfac.nro_cliente
+
+		Mientras NFDA(Afac) hacer
+			//Tratar corte
+			Si resg_cli<>Rfac.nro_cliente entonces
+				corte_cli()
+			FinSi
+
+			//Tratar registro
+			total_facturas := total_facturas + 1
+			total_facturado := total_facturado + Rfac.importe
+
+			//Leer registro
+			LEER(Afac, Rfac)
+		FinMientras
+
+		corte_cli()
+		CERRAR(Afac); CERRAR(Acli)
+
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejer_2_4_2 ES
+	AMBIENTE
+		Empleado = Registro
+			nro_sucursal: entero
+			categoria: ("A", "B", "C")
+			nombre_empleado: AN(40)
+			cod_curso: entero
+			tecnico: ("si", "no")
+		FinRegistro
+
+		Curso = Registro
+			cod_curso: entero
+			nombre_curso: AN(40)
+			fecha: Fecha
+			horas: entero
+		FinRegistro
+
+		Aemp: Archivo de Empleado ordenado por nro_sucursal, categoria
+		Acur: Archivo de Curso indexado por cod_curso
+		Remp: Empleado
+		Rcur: Curso
+
+		resg_sucursal: entero
+		resg_categoria: ("A", "B", "C")
+
+		tecnicos_categ, no_tecnicos_categ, total_categ: entero
+		tecnicos_suc, no_tecnicos_suc, total_suc: entero
+		tecnicos_total, no_tecnicos_total, total_general: entero
+
+		PROCEDIMIENTO corte_categoria() ES
+			PROCESO
+				ESCRIBIR("Sucursal: ", resg_sucursal)
+				ESCRIBIR("Categoria: ", resg_categoria)
+				ESCRIBIR("Empleados tecnicos: ", tecnicos_categ)
+				ESCRIBIR("Empleados no tecnicos: ", no_tecnicos_categ)
+				ESCRIBIR("Empleados totales: ", total_categ)
+
+				resg_categoria := Remp.categoria
+
+				tecnicos_suc := tecnicos_suc + tecnicos_categ
+				no_tecnicos_suc := no_tecnicos_suc + no_tecnicos_categ
+				total_suc := total_suc + total_categ
+
+				tecnicos_categ := 0
+				no_tecnicos_categ := 0
+				total_categ := 0
+		FIN_PROCEDIMIENTO
+
+		PROCEDIMIENTO corte_sucursal() ES
+			PROCESO
+				corte_categoria()
+				ESCRIBIR("Sucursal: ", resg_sucursal)
+				ESCRIBIR("Empleados tecnicos: ", tecnicos_suc)
+				ESCRIBIR("Empleados no tecnicos: ", no_tecnicos_suc)
+				ESCRIBIR("Empleados totales: ", total_suc)
+
+				resg_sucursal := Remp.nro_sucursal
+
+				tecnicos_total := tecnicos_total + tecnicos_suc
+				no_tecnicos_total := no_tecnicos_total + no_tecnicos_suc
+				total_general := total_general + total_suc
+
+				tecnicos_suc := 0
+				no_tecnicos_suc := 0
+				total_suc := 0
+		FIN_PROCEDIMIENTO
+
+	PROCESO
+		ABRIR E/(Aemp); ABRIR E/(Acur)
+		LEER(Aemp, Remp)
+
+		tecnicos_categ := 0; no_tecnicos_categ := 0; total_categ := 0
+		tecnicos_suc := 0; no_tecnicos_suc := 0; total_suc := 0
+		tecnicos_total := 0; no_tecnicos_total := 0; total_general := 0
+
+		Mientras NFDA(Aemp) hacer
+			//Tratar corte
+			Si resg_sucursal<>Remp.nro_sucursal entonces
+				corte_sucursal()
+			Sino
+				Si resg_categoria<>Remp.categoria entonces
+					corte_categoria()
+				FinSi
+			FinSi
+
+			//Tratar registro
+			Rcur.cod_curso := Remp.cod_curso
+			LEER(Acur, Rcur)
+			Si EXISTE entonces
+				ESCRIBIR("Sucursal: ", Remp.nro_sucursal)
+				ESCRIBIR("Categoria: ", Remp.categoria)
+				ESCRIBIR("Nombre: ", Remp.nombre_empleado)
+				ESCRIBIR("Curso: ", Rcur.nombre_curso)
+			Sino
+				ESCRIBIR("ERROR - Curso no existente")
+			FinSi
+
+			Segun Remp.tecnico hacer
+				"si": tecnicos_categ := tecnicos_categ + 1
+				"no": no_tecnicos_categ := no_tecnicos_categ + 1
+			FinSegun
+			total_categ := total_categ + 1
+
+			//Leer registro
+			LEER(Aemp, Remp)
+		FinMientras
+
+		corte_sucursal()
+
+		//Totales generales
+		ESCRIBIR("Total general de empleados tecnicos: ", tecnicos_total)
+		ESCRIBIR("Total general de empleados no tecnicos: ", no_tecnicos_total)
+		ESCRIBIR("Total general de empleados: ", total_general)
+
+		CERRAR(Aemp); CERRAR(Acur)
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejer_2_4_3 ES
+	AMBIENTE
+		
+	PROCESO
+		
+FIN_ACCION
