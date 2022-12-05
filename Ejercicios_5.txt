@@ -1,0 +1,181 @@
+//FUNCIONES RECURSIVAS 5_1
+
+ACCION Ejer_5_1_1 ES
+	// CB: Factorial = 1; si n = 1
+	// CR: Factorial = n * Factorial(n-1); si n>1
+	AMBIENTE
+		FUNCION Factorial(n: entero): entero ES
+			Si n = 1 entonces
+				Factorial := 1
+			Sino
+				Factorial := n * Factorial(n-1)
+			FinSi
+		FIN_FUNCION
+
+		dato: entero
+	PROCESO
+		ESCRIBIR("Ingrese un numero para calcular su factorial: ")
+		LEER(dato)
+
+		ESCRIBIR("El factorial de ", dato, " es: ", Factorial(dato))
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejer_5_1_2 ES
+	// CB: Fibo = n; si n < 2
+	// CR: Fibo = Fibo(n-1) + Fibo(n-2); si n >= 2
+	AMBIENTE
+		FUNCION Fibo(n: entero): entero ES
+			Si n<2 entonces
+				Fibo := n
+			Sino
+				Fibo := Fibo(n-1) + Fibo(n-2)
+			FinSi
+		FIN_FUNCION
+
+		dato, i: entero
+
+	PROCESO
+		ESCRIBIR("Ingrese un entero n para calcular el n-esimo valor de la sucesion de Fibonacci: ")
+		LEER(dato)
+
+		ESCRIBIR("El ", dato, "-esimo valor de la sucesion de Fibonacci es: ", Fibo(dato-1))
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejer_5_1_3 ES
+	//CB: Potencia = a; si b=1
+	//CR: Potencia = a * Potencia(a, b-1); si b>1
+	AMBIENTE
+		FUNCION Potencia(a, b: entero): entero ES
+			Si b=1 entonces
+				Potencia := a
+			Sino
+				Potencia := a * Potencia(a, b-1)
+			FinSi
+		FIN_FUNCION
+
+		base, exponente: entero
+
+	PROCESO
+		ESCRIBIR("Ingrese la base: ")
+		LEER(base)
+		ESCRIBIR("Ingrese el exponente: ")
+		LEER(exponente)
+
+		ESCRIBIR("El numero ", base, " a la ", exponente, " potencia es: ", Potencia(base, exponente))
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejer_5_1_4 ES
+	//CB: Pares = verdadero; si n=0
+	//CB: Pares = falso; si (n>0) y ((n MOD 10) MOD 2) <> 0
+	//CR: Pares = Pares(n DIV 10)
+
+	AMBIENTE
+		FUNCION Pares(n: entero): logico ES
+			Si n=0 entonces
+				Pares := verdadero
+			Sino
+				Si (n MOD 10) MOD 2	= 0 entonces
+					Pares := Pares(n DIV 10)
+				Sino
+					Pares := falso
+				FinSi
+			FinSi
+		FIN_FUNCION
+
+		dato: entero
+
+	PROCESO
+		ESCRIBIR("Ingrese un entero para saber si todos sus digitos son pares: ")
+		LEER(dato)
+
+		ESCRIBIR(Pares(dato))
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejer_5_1_5 ES
+	//CB: Division = 0; si a<b
+	//CR: Division = 1 + Division(a-b, b)
+	AMBIENTE
+		FUNCION Division(a, b: entero): entero ES
+			Si a<b entonces
+				Division := 0
+			Sino
+				Division := 1 + Division(a-b, b)
+			FinSi
+		FIN_FUNCION
+
+	PROCESO
+		ESCRIBIR("Ingrese el valor del dividendo: ")
+		LEER(a)
+		ESCRIBIR("Ingrese el valor del divisor: ")
+		LEER(b)
+
+		ESCRIBIR("El resultado de ", a, " DIV ", b, " es: ", Division(a, b))
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejer_5_1_6 ES
+	//CB: ParOImpar = n; si n <= 1 
+	//CR: ParOImpar = ParOImpar(n-2); si n > 1
+	AMBIENTE
+		FUNCION ParOImpar(n: entero): enero ES
+			Si n<=1 entonces
+				ParOImpar := n
+			Sino
+				ParOImpar := ParOImpar(n-2)
+			FinSi
+		FIN_FUNCION
+		
+		dato: entero
+	PROCESO
+		ESCRIBIR("Ingrese un entero para saber si es par o impar: ")
+		LEER(dato)
+
+		Si ParOImpar(dato)=1 entonces
+			ESCRIBIR("El numero ingresado es impar")
+		Sino
+			ESCRIBIR("El numero ingresado es par")
+		FinSi
+FIN_ACCION
+
+================================================================================================================
+
+//ARBOLES 5_3
+
+ACCION Ejer_5_3_4(r: Puntero a T) ES
+	AMBIENTE
+		T = Registro
+			dato: entero
+			izq, der: Puntero a T
+		FinRegistro
+
+		p: Puntero a T
+
+		PROCEDIMIENTO En-orden(p: Puntero a T) ES
+			Si p<>nill entonces
+				Si *p.izq=nill y *p.der=nill entonces
+					ESCRIBIR(*p.dato)
+				Sino
+					En-orden(*p.izq)
+					ESCRIBIR(*p.dato)
+					En-orden(*p.der)
+				FinSi
+			FinSi
+		FIN_PROCEDIMIENTO
+
+	PROCESO
+		p := r
+		ESCRIBIR("Recorrido del arbol: ")
+		En-orden(p)
+FIN_ACCION
+
+================================================================================================================
+

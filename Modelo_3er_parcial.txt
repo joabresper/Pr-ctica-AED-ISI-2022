@@ -1,0 +1,82 @@
+ACCION Ejer_parcial(primE: Puntero a Nodo_regalo) ES
+	AMBIENTE
+		Cliente = Registro
+			celular: N(13)
+			dni: M(8)
+		FinRegistro
+
+		Nodo_regalo = Registro
+			id_regalo: AN(255)
+			cantidad: N(4)
+			prox: Puntero a Nodo_regalo
+		FinRegistro
+
+		Nodo_cliente = Registro
+			dni: N(8)
+			id_regalo: AN(255)
+			prox: Puntero a Nodo_cliente
+		FinRegistro
+
+		Nodo_clienteSR = Registro
+			dni: N(8)
+			ant, prox: Puntero a Nodo_clienteSR
+		FinRegistro
+
+		A: Archivo de Cliente
+		Reg: Cliente
+
+		r: Puntero a Nodo_regalo
+		c, p, prim_cli: Puntero a Nodo_cliente
+		c2, cSR, prim_SR, ult_SR: Puntero a Nodo_clienteSR
+
+		dni_repetido: booleano
+
+	PROCESO
+		ABRIR E/ (A); LEER(A, Reg)
+
+		r := primE
+
+		prim_cli := nil
+		c := prim_cli
+
+		prim_SR := nil
+		ult_SR := nil
+		cSR := prim_SR
+		
+		Mientras NFDA(A) hacer
+			//----Buscar si el DNI ya esta cargado en la lista simple de salida
+			repetido := falso
+			Mientras (c <> nil) y (*c.dni <> Reg.dni) hacer
+				c := *c.prox
+			FinMientras
+
+			Si *c.dni = Reg.dni entonces
+				dni_repetido := verdadero
+			FinSi
+
+			//----Cargar lista simple de salida
+			Si no dni_repetido entonces
+				Si *r.cantidad > 0 entonces
+					NUEVO(p)
+					*p.dni := Reg.dni
+					*p.id_regalo := *r.id_regalo
+					*r.id_regalo := *r.id_regalo -1
+					r := *r.prox
+				Sino
+					NUEVO(cSR)
+					*cSR.dni := Reg.dni
+					Si (prim_SR = nil) y (ult_SR = nil) entonces
+						*cSR.prox := ult_SR
+						*cSR.ant := prim_SR
+						prim_SR := cSR
+						ult_SR := cSR
+					Sino
+						c2 := prim_SR
+						Mientras (*c2.prox <> nil) y (*c2.dni < *cSR.dni) hacer
+							c2 := *c2.prox
+						FinMientras
+						Si (*c2.dni < *cSR.dni) entonces
+							
+
+
+

@@ -1,0 +1,206 @@
+ACCION Ejer_4_9(prim: Puntero a Nodo) ES
+	AMBIENTE
+		Nodo = Registro
+			dato: N(5)
+			prox: Puntero a Nodo
+		FinRegistro
+
+		T: Arreglo [1..255] de caracter
+		p, q, b, primS: Puntero a Nodo
+		i, j: entero
+
+		FUNCION Multiplicador(n: entero): entero ES
+			Si n<=8 entonces
+				Multiplicador := n
+			Sino
+				Multiplicador := Multiplicador(n-8)
+			FinSi
+		FIN_FUNCION
+
+		FUNCION Encontrar_mult(n: entero): entero ES
+			b := prim
+			j := 1
+			Mientras (*b.prox<>prim) y (j<>n) hacer
+				b := *b.prox
+				j := j + 1
+			FinMientras
+
+			Encontrar_mult := *b.dato
+		FIN_FUNCION
+
+
+
+		FUNCION Suma_digitos(n: entero): entero ES
+			Si n<10 entonces
+				Suma_digitos := n
+			Sino
+				Suma_digitos := (n MOD 10) + Suma_digitos(n DIV 10)
+			FinSi
+		FIN_FUNCION
+
+	PROCESO
+		ESCRIBIR("Ingrese un texto de 255 caracteres como maximo. Finalice con un punto.")
+		i := 0
+		Repetir
+			i := i + 1
+			LEER(A[i])
+		Hata que (i=255) o (A[i]=".")
+
+		primS := nil
+
+		i := 1
+		Mientras (A[i]<>".") o (i<=255) hacer
+			NUEVO(p)
+			*p.dato := Suma_digitos(Encontrar_mult(Multiplicador(i)) * ASCII(A[i]))
+			
+			Si primS = nil entonces
+				primS := p
+			Sino
+				*q.prox := p
+			FinSi
+			q := p
+			*p.prox := nil
+
+			i := i + 1
+		FinMientras
+
+		q := primS
+		Mientras q<>nil hacer
+			ESCRIBIR(*q.dato)
+			q := *q.prox
+		FinMientras
+FIN_ACCION
+
+================================================================================================================
+
+ACCION Ejer_4_12 ES
+	AMBIENTE
+		Cliente = Registro
+			nombre: AN(25)
+			direccion: AN(25)
+			telefono: N(10)
+			estado: ("pendiente", "enviado")
+			total: N(5)
+			ant, prox: Puntero a Cliente
+		FinRegistro
+
+		prim, ult, p, a: Puntero a Cliente
+		nomx: AN(25)
+
+		PROCEDIMIENTO Cargar_datos(punt: Puntero a Cliente) ES
+			ESCRIBIR("Nombre: "); LEER(*punt.nombre)
+			ESCRIBIR("Direccion: "); LEER(*punt.direccion)
+			ESCRIBIR("Telefono: "); LEER(*punt.telefono)
+			ESCRIBIR("Total: "); LEER(*punt.total)
+			*punt.estado := "pendiente"
+		FIN_PROCEDIMIENTO
+
+	PROCESO
+		prim := nil
+		ult := nil
+		a := nil
+
+		Repetir
+			ESCRIBIR("Ingrese una opcion:")
+			ESCRIBIR("[1] Registrar pedido")
+			ESCRIBIR("[2] Registrar envio de pedido")
+			ESCRIBIR("[3] Eliminar del listado envio cobrado")
+			ESCRIBIR("[4] Salir")
+			LEER(opcion)
+
+			Segun opcion hacer
+				1:	NUEVO(p)
+					Cargar_datos(p)
+					q := prim
+	
+					Mientras (q<>nil) y (*p.nombre > *q.nombre) hacer
+						a := q
+						q := *q.prox
+					FinMientras
+
+					Si a = nil entonces
+						*p.prox := prim
+						*p.ant := a
+						prim := p
+						Si *p.prox=nil entonces
+							ult := p
+						Sino
+							*ult.ant := p
+						FinSi
+					Sino
+						*p.ant := a
+						*p.prox := q
+						*a.prox := p
+						Si a=ult entonces
+							ult := p
+						Sino
+							*q.ant := p
+						Finsi
+					FinSi
+				
+				2:	ESCRIBIR("Ingrese el nombre del cliente: ")
+					LEER(nomx)
+
+					q := prim
+
+					Mientras (q<>nil) y (*q.nombre<>nomx) hacer
+						q := *q.prox
+					FinMientras
+
+					Si q=nil entonces
+						ESCRIBIR("Cliente no encontrado")
+					Sino
+						Si *q.estado="pendiente"
+							*q.estado := "enciado"
+							ESCRIBIR("Envio confirmado")
+						Sino
+							ESCRIBIR("El envio ya fue enviado")
+						FinSi
+					FinSi
+				
+				3:	ESCRIBIR("Ingrese el nombre del cliente: ")
+					LEER(nomx)
+
+					q := prim
+
+					Mientras (q<>nil) y (*q.nombre<>nomx) hacer
+						q := *q.prox
+					FinMientras
+
+					Si q=nil entonces
+						ESCRIBIR("Cliente no encontrado")
+					Sino
+						Si *q.estado="pendiente" entonces
+							ESCRIBIR("Todavia no se realizo el envio del pedido")
+						Sino
+							Si prim=ult entonces
+								prim := nil
+								ult := nil
+							Sino
+								Si q=prim entonces
+									*(*q.prox).ant := nil
+									prim := *q.prox
+								Sino
+									Si q=ult entonces
+										*(*q.ant).prox := nil
+										ult := *q.ant
+									Sino
+										*(*q.ant).prox := *q.prox
+										*(*q.prox).ant := *q.ant
+									FinSi
+								FinSi
+							FinSi
+							DISPONER(q)
+						FinSi
+					FinSi
+			FinSegun
+		Hasta que (opcion>3) o (opcion<1)
+FIN_ACCION
+
+							
+							
+
+
+
+
+			

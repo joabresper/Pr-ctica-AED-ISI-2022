@@ -1,0 +1,235 @@
+ACCION Modelo(prim, ult: Puntero a Cancion) ES
+	//Se supone que la lista de canciones de entrada es una lista doble enlazada
+
+	AMBIENTE
+		Cancion = Registro
+			nro: entero 		//campo de ordenamiento
+			nombre: AN(30)
+			interprete: AN(30)
+			genero: AN(20)
+			duracion: entero
+			ant, prox: Puntero a Cancion
+		FinRegistro
+
+		primG, ultG, g, p, c, a: Puntero a Cancion
+
+		opcion: N(1)
+		genero: AN(20)
+		infinita: ("activada", "desactivada")
+
+	PROCESO
+		ESCRIBIR("Seleccione una opcion: [1] Filtrar por genero - [2] Activar/Desactivar reproduccion infinita" - [3] Salir)
+		LEER(opcion)
+
+		infinita := "desactivada"
+		
+		Mientras opcion>0 y opcion<3 hacer
+			Segun opcion hacer
+				1:	ESCRIBIR("Ingrese el genero: "); LEER(genero)\
+					primG := nil
+					ultG := nil
+					p := prim
+
+					Mientras p<>nil hacer
+						Si *p.genero = genero entonces
+							NUEVO(g)
+
+							//Asigno campos
+							*g.nro := *p.nro
+							*g.nombre := *p.nombre
+							*g.interprete := *p.interprete
+							*g.genero := genero
+							*g.duracion := *p.duracion
+
+							c := primG
+							a := nil
+
+							//Busqueda de lugar ordenado de insercion
+							Mientras (c<>nil) y (*g.nro>*c.nro) hacer
+								a := c
+								c := *c.prox
+							FinMientras
+
+							//Inserciones dependiendo de posicion
+							Si a=nil entonces	//Casos listaG vacia o con 1 solo elemento
+								*g.prox := primG
+								*g.ant := a
+								primG := g
+								Si *g.prox=nil entonces
+									ultG := g
+								Sino
+									*ultG.ant := g
+								FinSi
+							Sino	//Casos insercion intermedia o al final
+								*g.prox := c
+								*g.ant := a
+								*a.prox := g
+								Si a=ultG entonces
+									ultG := g
+								Sino
+									*c.ant := g
+								FinSi
+							FinSi
+						FinSi
+
+						p := *p.prox
+					FinMientras
+
+				2:	ESCRIBIR("La opcion de reproduccion infinita se encuentra ", infinita)
+					Si infinita="desactivada" entonces
+						ESCRIBIR("Activando opcion")
+						ult.prox := prim
+						prim.ant := ult
+					Sino
+						ESCRIBIR("Desactivando opcion")
+						ult.prox := nil
+						prim.ant := nil
+					FinSi
+			FinSegun
+		
+			ESCRIBIR("Seleccione una opcion: [1] Filtrar por genero - [2] Activar/Desactivar reproduccion infinita" - [3] Salir)
+			LEER(opcion)
+		FinMientras
+FIN_ACCION
+
+====================================================================================
+Algoritmo recursivo que devuelva la cantidad de digitos de un entero
+
+				Digitos := 1;	si n<10
+Digitos(n)
+				Digitos := 1 + Digitos(n DIV 10);	si n>=10
+
+FUNCION Digitos(n: entero): entero ES
+	Si n<10 entonces
+		Digitos := 1
+	Sino
+		Digitos := 1 + Digitos(n DIV 10)
+	FinSi
+FIN_FUNCION
+
+====================================================================================
+ACCION ModeloX ES
+	AMBIENTE
+		Nodo = Registro
+			dato: N(1)
+			ant, prox: Puntero a Nodo
+		FinRegistro
+
+		prim, q, p, prim2, ult2: Puntero a Nodo
+		dato, mult, i: entero
+
+		SUBACCION Enc1(prim: Puntero a Nodo) ES
+			Si prim=nil entonces
+				ESCRIBIR("Lista vacia")
+			Sino
+				mult := *p.dato	// mult := 3
+				prim2 := nil
+				ult2 := nil
+				p := nil	// p := prim
+
+				Mientras p<>nil hacer
+					NUEVO(q)
+					dato := (*p.dato)*mult
+
+					Si dato>9 entonces
+						*q.dato := *p.dato
+					Sino
+						*q.dato := dato
+					FinSi
+
+					Si prim2=nil entonces
+						prim2 := p	// prim2 := q
+						*q.prox := nil
+						ult2 := q
+					Sino
+						*ult2.prox := q
+						// *q.ant := ult2
+						*q.prox := nil
+						// ult2 := q
+					FinSi
+
+					p := *p.prox
+					mult := mult + 1
+				FinMientras
+			FinSi
+		FIN_SUBACCION
+
+		SUBACCION Enc2(prim2: Puntero a Nodo) ES
+			Si prim2=nil entonces
+				ESCRIBIR("Lista vacia")
+			Sino
+				q := prim2
+
+				Mientras *q.prox<>nil hacer
+					dato := (*q.dato)*2	// dato := (*q.dato) + (*(*q.prox).dato)
+					
+					Si dato<9 entonces
+						*q.dato := dato
+					FinSi
+
+					q := *q.prox
+				FinMientras
+			FinSi
+		FIN_SUBACCION
+
+	PROCESO
+		ESCRIBIR("Ingrese un entero de 10 digitos para encriptarlo: ")
+
+		prim := nil
+		p := prim
+
+		// Generara lista con digitos a encriptar
+		Para i:=1 hasta 10 hacer
+			NUEVO(q)
+			LEER(*q.dato)
+
+			Si prim=nil entonces
+				prim := q
+			Sino
+				*p.prox := q
+			FinSi
+
+			*q.prox := nil
+			p := q
+		FinPara
+
+		// Primer encriptacion
+		Enc1(prim)
+
+		// Segunda encriptacion
+		Enc2(prim2)
+
+		// Mostrar clave numerica original
+		p := prim
+		Mientras p<>nil hacer
+			ESCRIBIR(*p.dato)
+			p := *p.prox
+		FinMientras
+
+		//Mostrar clave encriptada
+		p := prim2
+		Mientras p<>nil hacer
+			ESCRIBIR(*p.dato)
+			p := *p.prox
+		FinMientras
+FIN_ACCION
+
+===========================================================================
+
+			Suma_elem := A[l]	si l=1
+Suma_elem
+			Suma_elem := A[l] + Suma_elem(A, l-1)
+
+FUNCION Suma_elem(A: Arreglo, l: entero): entero ES
+	Si l=1 entonces
+		Suma_elem := A[l]
+	Sino
+		Suma_elem := A[l] + Suma_elem(A, l-1)
+	FinSi
+FIN_ACCION
+
+
+
+
+
+
